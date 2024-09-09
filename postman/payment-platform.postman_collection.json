@@ -1,0 +1,148 @@
+{
+	"info": {
+		"_postman_id": "a36ddfbb-e1ba-47a5-908a-a62d2181ad43",
+		"name": "deuna-payment-platform",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19855305"
+	},
+	"item": [
+		{
+			"name": "/status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/status",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody)",
+							"pm.environment.set(\"authToken\", data.AuthenticationToken)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/token",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/payments",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody)",
+							"pm.environment.set(\"paymentID\", data.paymentID)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"CustomerID\": \"test@customer\",\n    \"CustomerName\": \"randomName\",\n    \"CardNumber\": \"1234123412341234\",\n    \"CardCVV\": 123,\n    \"CardExpiryDate\": \"06/27\",\n    \"Price\": 100,\n    \"Currency\": \"USD\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/payments",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/payments/{paymentID}",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseURL}}/payments/{{paymentID}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"payments",
+						"{{paymentID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/payments/{paymentID}/refund",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseURL}}/payments/{{paymentID}}/refund",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"payments",
+						"{{paymentID}}",
+						"refund"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

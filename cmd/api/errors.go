@@ -23,7 +23,13 @@ func (app *application) reportServerError(r *http.Request, err error) {
 	app.logger.Error(message, requestAttrs, "trace", trace)
 }
 
-func (app *application) errorMessage(w http.ResponseWriter, r *http.Request, status int, message string, headers http.Header) {
+func (app *application) errorMessage(
+	w http.ResponseWriter,
+	r *http.Request,
+	status int,
+	message string,
+	headers http.Header,
+) {
 	message = strings.ToUpper(message[:1]) + message[1:]
 
 	err := response.JSONWithHeaders(w, status, map[string]string{"Error": message}, headers)
@@ -54,9 +60,30 @@ func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err e
 	app.errorMessage(w, r, http.StatusBadRequest, err.Error(), nil)
 }
 
-func (app *application) failedValidation(w http.ResponseWriter, r *http.Request, v validator.Validator) {
+func (app *application) failedValidation(
+	w http.ResponseWriter,
+	r *http.Request,
+	v validator.Validator,
+) {
 	err := response.JSON(w, http.StatusUnprocessableEntity, v)
 	if err != nil {
 		app.serverError(w, r, err)
 	}
+}
+
+func (app *application) invalidAuthenticationToken(w http.ResponseWriter, r *http.Request) {
+	headers := make(http.Header)
+	headers.Set("WWW-Authenticate", "Bearer")
+
+	app.errorMessage(w, r, http.StatusUnauthorized, "Invalid authentication token", headers)
+}
+
+func (app *application) authenticationRequired(w http.ResponseWriter, r *http.Request) {
+	app.errorMessage(
+		w,
+		r,
+		http.StatusUnauthorized,
+		"You must be authenticated to access this resource",
+		nil,
+	)
 }
